@@ -18,10 +18,10 @@ project:
   # Don't forget to also update `PROJECT_SOURCES` in test/Makefile.
   source_files:
     - "project.v"
-    - "moving_grass_bg.v"
-    - "uw_bouncing_bg.v"
+    # - "moving_grass_bg.v"
+    # - "uw_bouncing_bg.v"
     - "hvsync_generator.v"
-    - "oiia_sound.v"
+    # - "oiia_sound.v"
     - "goose_sprite.v"
 
 # The pinout of your project. Leave unused pins blank. DO NOT delete or add any pins.

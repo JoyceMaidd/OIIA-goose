@@ -33,13 +33,13 @@ module tt_um_oiia_goose (
     wire [1:0] goose_G;
     wire [1:0] goose_B;
 
-    // Background RGB
-    wire [1:0] moving_grass_R;
-    wire [1:0] moving_grass_G;
-    wire [1:0] moving_grass_B;
-    wire [1:0] uw_bouncing_R;
-    wire [1:0] uw_bouncing_G;
-    wire [1:0] uw_bouncing_B;
+    // // Background RGB
+    // wire [1:0] moving_grass_R;
+    // wire [1:0] moving_grass_G;
+    // wire [1:0] moving_grass_B;
+    // wire [1:0] uw_bouncing_R;
+    // wire [1:0] uw_bouncing_G;
+    // wire [1:0] uw_bouncing_B;
 
     wire in_goose;
 
@@ -65,37 +65,37 @@ module tt_um_oiia_goose (
         .vpos(pix_y)
     );
 
-    oiia_sound oiia_sound_inst(
-        .x(pix_x),
-        .y(pix_y),
-        .clk(clk),      // clock
-        .rst_n(rst_n),    // reset_n - low to reset
-        .sound(sound)
-    );
+    // oiia_sound oiia_sound_inst(
+    //     .x(pix_x),
+    //     .y(pix_y),
+    //     .clk(clk),      // clock
+    //     .rst_n(rst_n),    // reset_n - low to reset
+    //     .sound(sound)
+    // );
 
-    moving_grass_bg moving_grass_bg_inst( 
-        .clk(clk),                   // system clock
-        .rst_n(rst_n),               // active-low reset
-        .counter(counter),
-        .video_active(video_active),
-        .pix_x(pix_x),
-        .pix_y(pix_y),
-        .R(moving_grass_R),
-        .G(moving_grass_G),
-        .B(moving_grass_B)
-    );
+    // moving_grass_bg moving_grass_bg_inst( 
+    //     .clk(clk),                   // system clock
+    //     .rst_n(rst_n),               // active-low reset
+    //     .counter(counter),
+    //     .video_active(video_active),
+    //     .pix_x(pix_x),
+    //     .pix_y(pix_y),
+    //     .R(moving_grass_R),
+    //     .G(moving_grass_G),
+    //     .B(moving_grass_B)
+    // );
     
-    uw_bouncing_bg uw_bouncing_bg_inst( 
-        .clk(clk),                   // system clock
-        .rst_n(rst_n),               // active-low reset
-        .counter(counter),
-        .video_active(video_active),
-        .pix_x(pix_x),
-        .pix_y(pix_y),
-        .R(uw_bouncing_R),
-        .G(uw_bouncing_G),
-        .B(uw_bouncing_B)
-    );
+    // uw_bouncing_bg uw_bouncing_bg_inst( 
+    //     .clk(clk),                   // system clock
+    //     .rst_n(rst_n),               // active-low reset
+    //     .counter(counter),
+    //     .video_active(video_active),
+    //     .pix_x(pix_x),
+    //     .pix_y(pix_y),
+    //     .R(uw_bouncing_R),
+    //     .G(uw_bouncing_G),
+    //     .B(uw_bouncing_B)
+    // );
 
     // Insert goose module
     goose_sprite goose_inst (
@@ -127,31 +127,32 @@ module tt_um_oiia_goose (
                 R_reg <= goose_R;
                 G_reg <= goose_G;
                 B_reg <= goose_B;
-            end else begin
-                // Choose colors based on selected background
-                case (ui_in[1:0])
-                    2'b00: begin
-                        R_reg <= moving_grass_R;
-                        G_reg <= moving_grass_G;
-                        B_reg <= moving_grass_B;
-                    end
-                    2'b01: begin
-                        R_reg <= uw_bouncing_R;
-                        G_reg <= uw_bouncing_G;
-                        B_reg <= uw_bouncing_B;
-                    end
-                    2'b10: begin
-                        R_reg <= 2'b00;
-                        G_reg <= 2'b01;
-                        B_reg <= 2'b11;
-                    end
-                    2'b11: begin
-                        R_reg <= 2'b00;
-                        G_reg <= 2'b11;
-                        B_reg <= 2'b01;
-                    end
-                endcase
-            end
+            end 
+            // else begin
+            //     // Choose colors based on selected background
+            //     case (ui_in[1:0])
+            //         2'b00: begin
+            //             R_reg <= moving_grass_R;
+            //             G_reg <= moving_grass_G;
+            //             B_reg <= moving_grass_B;
+            //         end
+            //         2'b01: begin
+            //             R_reg <= uw_bouncing_R;
+            //             G_reg <= uw_bouncing_G;
+            //             B_reg <= uw_bouncing_B;
+            //         end
+            //         2'b10: begin
+            //             R_reg <= 2'b00;
+            //             G_reg <= 2'b01;
+            //             B_reg <= 2'b11;
+            //         end
+            //         2'b11: begin
+            //             R_reg <= 2'b00;
+            //             G_reg <= 2'b11;
+            //             B_reg <= 2'b01;
+            //         end
+            //     endcase
+            // end
         end
     end  
 endmodule
