@@ -13,7 +13,7 @@ Displays the OIIA goose demoscene
 
 ## How to test
 
-Build the project and generate the SVH files used by `src/graphics.v`.
+Build the project and generate the SVH files used by `src/graphics.sv`.
 
 1. Create a build directory and build the helper tools:
 
@@ -29,12 +29,12 @@ cmake --build .
 ./make_bitmaps ../src ../data/frame0.bmp ../data/frame1.bmp ../data/frame2.bmp ../data/frame3.bmp
 ```
 
-- This writes `../src/palette.svh` and `../src/frame0.svh` .. `../src/frame3.svh` which are included by `src/graphics.v`.
+- This writes `../src/palette.svh` and `../src/frame0.svh` .. `../src/frame3.svh` which are included by `src/graphics.sv`.
 
 Notes:
 
 The project currently uses 32×32 BMPs.
-- To change frame timing or number of frames, edit `src/graphics.v` and the included `frameN.svh` files accordingly.
+- To change frame timing or number of frames, edit `src/graphics.sv` and the included `frameN.svh` files accordingly.
 
 ## External hardware
 

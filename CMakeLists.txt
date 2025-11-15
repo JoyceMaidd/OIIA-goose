@@ -6,7 +6,7 @@ find_package(verilator REQUIRED)
 
 file(GLOB VERILOG_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/hdl/*.v
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/*.v
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/*.sv
 )
 
 # Provide a convenience target to run verilator lint on all Verilog sources
