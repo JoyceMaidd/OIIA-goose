@@ -17,9 +17,10 @@ module tt_um_goose (
 );
 
   // All output pins must be assigned. If not used, assign to 0.
-  assign uio_out[6:0] = 7'b0000000;
-  assign uio_oe = 8'b10000000;
-
+  assign uio_out = 0;
+  assign uio_oe  = 0;
   graphics gfx(.clk(clk), .rst_n(rst_n), .vga_pmod(uo_out));
+  // List all unused inputs to prevent warnings
+  wire _unused = &{ena, clk, ui_in, uio_in, 1'b0};
 
 endmodule
