@@ -2,7 +2,21 @@ cmake_minimum_required(VERSION 3.16)
 
 project(oiia-goose LANGUAGES CXX)
 
-file(GLOB VERILOG_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/hdl/*.v)
+find_package(verilator REQUIRED)
+
+file(GLOB VERILOG_SOURCES
+    ${CMAKE_CURRENT_SOURCE_DIR}/hdl/*.v
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/*.v
+)
+
+# Provide a convenience target to run verilator lint on all Verilog sources
+if (VERILATOR_EXECUTABLE)
+    add_custom_target(verilator_check
+        COMMAND ${VERILATOR_EXECUTABLE} --lint-only ${VERILOG_SOURCES}
+        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+        COMMENT "Run Verilator lint on Verilog sources"
+    )
+endif()
 
 # No `oiia-goose` target is created in this CMakeLists.  Set the C++
 # standard and common compile flags globally instead of applying them
