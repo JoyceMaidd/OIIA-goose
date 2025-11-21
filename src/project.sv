@@ -5,7 +5,7 @@
 
 `default_nettype none
 
-module tt_um_vga_example(
+module tt_um_goose(
     input  wire [7:0] ui_in,
     output wire [7:0] uo_out,
     input  wire [7:0] uio_in,
@@ -15,6 +15,11 @@ module tt_um_vga_example(
     input  wire       clk,
     input  wire       rst_n
 );
+    assign uio_out = 0;
+    assign uio_oe  = 0;
+    
+    // List all unused inputs to prevent warnings
+    wire _unused = &{ena, clk, ui_in, uio_in, 1'b0};
 
     //------------------------------------------------------------
     // VGA signals
