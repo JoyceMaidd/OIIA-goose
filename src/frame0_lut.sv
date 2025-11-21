@@ -1,7 +1,7 @@
 
 //------------------------------------------------------------
 // 32×32 FRAME — bitmap stored in frame0[y][x]
-//     frame0[][] contains a 4-bit palette index
+//     frame0[][] contains a 3-bit palette index
 //------------------------------------------------------------
 module frame0_lut(
     input  wire [4:0] x,    // 0–31
@@ -9,7 +9,6 @@ module frame0_lut(
     output wire [2:0] pixel
 );
     `include "frame0.svh"
-    always@(*) begin
-        pixel = frame0[y][x];
-    end
+
+    assign pixel = frame0[y][x];
 endmodule

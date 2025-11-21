@@ -60,7 +60,7 @@ module tt_um_goose(
 
     wire in_shape = pix_x[8] && !pix_x[9] && !pix_y[8];
 
-    frame0_lut frame0 (
+    frame0_lut frame0_inst (
         .x(pix_x[7:3]),   // downsample to 64 pixels horizontally
         .y(pix_y[7:3]),   // downsample to 64 pixels vertically
         .pixel(pixel_index)
@@ -73,7 +73,7 @@ module tt_um_goose(
     //------------------------------------------------------------
     wire [1:0] pal_r, pal_g, pal_b;
 
-    palette_lut palette (
+    palette_lut palette_inst (
         .index(pixel_index),
         .subpixel(pix_x[1:0] ^ pix_y[1:0]), // Dithering (blending colours using subpixels)
         .r(pal_r),
