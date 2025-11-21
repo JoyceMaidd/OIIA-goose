@@ -9,5 +9,7 @@ module frame0_lut(
     output wire [2:0] pixel
 );
     `include "frame0.svh"
-    pixel = frame0[y][x];
+    always@(*) begin
+        pixel = frame0[y][x];
+    end
 endmodule
