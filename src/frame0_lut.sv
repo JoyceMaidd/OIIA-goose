@@ -9,6 +9,9 @@ module frame0_lut(
     output wire [2:0] pixel
 );
     `include "frame0.svh"
+    `include "frame1.svh"
+    `include "frame2.svh"
+    `include "frame3.svh"
 
     assign pixel = frame0[y][x];
 endmodule

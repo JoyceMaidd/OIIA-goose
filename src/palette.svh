@@ -1,6 +1,6 @@
 // palette[index][subpixel] = 6-bit  {r,g,b}
 // 16 palette entries, each with 4 subpixels
-reg [5:0] palette [7:0][3:0];
+reg [5:0] palette [0:7][0:3];
 
 initial begin
     // Example palette — same values you had
@@ -30,11 +30,11 @@ initial begin
     palette[3'h4][2] = {2'b11, 2'b11, 2'b10}; // Tone B
     palette[3'h4][3] = {2'b11, 2'b11, 2'b11}; // Tone A
 
-    // #b3925d warm brown/golden (2-bit RGB, 4-pixel dither)
-    palette[3'h5][0] = {2'b11, 2'b10, 2'b01}; // Tone A: R=3,G=2,B=1 (lighter warm brown)
-    palette[3'h5][1] = {2'b10, 2'b10, 2'b01}; // Tone B: R=2,G=2,B=1 (base brown)
-    palette[3'h5][2] = {2'b10, 2'b10, 2'b01}; // Tone B
-    palette[3'h5][3] = {2'b11, 2'b10, 2'b01}; // Tone A
-
+    // Muted brown (#806d55) in 2-bit RGB w/4-pixel dither
+    palette[3'h5][0] = {2'b10, 2'b01, 2'b00}; // Tone A: base muted brown (R=2,G=1,B=1)
+    palette[3'h5][1] = {2'b10, 2'b01, 2'b01}; // Tone B: slightly darker (R=2,G=1,B=0)
+    palette[3'h5][2] = {2'b01, 2'b01, 2'b00}; // Tone B
+    palette[3'h5][3] = {2'b00, 2'b01, 2'b01}; // Tone A
+    
     // ... keep adding colors 3-F here (up to 8 colours total) ...
 end
