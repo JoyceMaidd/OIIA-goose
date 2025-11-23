@@ -1,5 +1,5 @@
 // frame0.svh — 25x25 goose sprite ROM
-reg [3:0] frame0 [0:24][0:24];
+reg [2:0] frame0 [0:24][0:24];
 
 initial begin
     frame0[0][0] = 4'd0;
