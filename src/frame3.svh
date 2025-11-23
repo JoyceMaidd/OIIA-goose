@@ -1,22 +1,22 @@
-reg [2:0] frame3 [0:1][0:1];
+reg [2:0] frame3 [0:15][0:15];
 
 initial begin
     frame3[0][0] = 3'h0;
     frame3[0][1] = 3'h0;
-    // frame3[0][2] = 3'h0;
-    // frame3[0][3] = 3'h0;
-    // frame3[0][4] = 3'h0;
-    // frame3[0][5] = 3'h0;
-    // frame3[0][6] = 3'h0;
-    // frame3[0][7] = 3'h0;
-    // frame3[0][8] = 3'h0;
-    // frame3[0][9] = 3'h0;
-    // frame3[0][10] = 3'h0;
-    // frame3[0][11] = 3'h0;
-    // frame3[0][12] = 3'h0;
-    // frame3[0][13] = 3'h0;
-    // frame3[0][14] = 3'h0;
-    // frame3[0][15] = 3'h0;
+    frame3[0][2] = 3'h0;
+    frame3[0][3] = 3'h0;
+    frame3[0][4] = 3'h0;
+    frame3[0][5] = 3'h0;
+    frame3[0][6] = 3'h0;
+    frame3[0][7] = 3'h0;
+    frame3[0][8] = 3'h0;
+    frame3[0][9] = 3'h0;
+    frame3[0][10] = 3'h0;
+    frame3[0][11] = 3'h0;
+    frame3[0][12] = 3'h0;
+    frame3[0][13] = 3'h0;
+    frame3[0][14] = 3'h0;
+    frame3[0][15] = 3'h0;
     // frame3[0][16] = 3'h0;
     // frame3[0][17] = 3'h0;
     // frame3[0][18] = 3'h0;

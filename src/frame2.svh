@@ -1,4 +1,4 @@
-reg [2:0] frame2 [0:1][0:1];
+reg [2:0] frame2 [0:15][0:15];
 
 initial begin
     frame2[0][0] = 3'h0;

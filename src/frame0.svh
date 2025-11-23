@@ -1,5 +1,5 @@
 // 64×64 pixels, each 4 bits
-reg [2:0] frame0 [0:1][0:1];
+reg [2:0] frame0 [0:15][0:15];
 
 initial begin
     frame0[0][0] = 3'd0;
