@@ -66,7 +66,7 @@ module tt_um_goose(
     end
 
 
-    frame0_lut frame0 (
+    frame_lut frame (
         .x(pix_x[7:3]),
         .y(pix_y[7:3]),
         .pixel0(pixel_index0),

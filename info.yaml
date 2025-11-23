@@ -19,7 +19,7 @@ project:
   source_files:
     - "project.sv"
     - "hvsync_generator.sv"
-    - "frame0_lut.sv"
+    - "frame_lut.sv"
     - "palette_lut.sv"
 
 # The pinout of your project. Leave unused pins blank. DO NOT delete or add any pins.
