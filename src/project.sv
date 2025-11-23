@@ -66,7 +66,7 @@ module tt_um_goose(
     end
 
 
-    frame_lut frame (
+    frame_lut frame_inst (
         .x(pix_x[7:3]),
         .y(pix_y[7:3]),
         .pixel0(pixel_index0),
@@ -82,7 +82,7 @@ module tt_um_goose(
     //------------------------------------------------------------
     wire [1:0] pal_r, pal_g, pal_b;
 
-    palette_lut palette (
+    palette_lut palette_inst (
         .index(pixel_index),
         .subpixel(pix_x[1:0] ^ pix_y[1:0]), // Dithering (blending colours using subpixels)
         .r(pal_r),
