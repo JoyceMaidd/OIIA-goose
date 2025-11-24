@@ -32,7 +32,7 @@ module uw_bouncing(
 
     wire [9:0] uw_x = pix_x - uw_x_pos;
     wire [9:0] uw_y = pix_y - uw_y_pos;
-    wire colour = uw_frame[uw_y][uw_x];
+    wire colour = uw_frame[uw_y[3:0]][uw_x[5:0]];
 
     assign r = in_logo ? {!colour, !colour} : 2'b11;
     assign g = in_logo ? {!colour, !colour} : 2'b11;

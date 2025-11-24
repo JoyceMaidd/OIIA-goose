@@ -12,7 +12,7 @@ module sound_module(
   
   reg part1;
 
-  wire [4:0] envelopeB = 5'd31 - timer[1:0] << 3;// exp(t*-20) decays to 0 approximately in 16 frames  [255 181 129  92  65  46  33  23  16  12   8   6   4   3]
+  wire [4:0] envelopeB = 5'd31 - ({3'b000, timer[1:0]} << 3);// exp(t*-20) decays to 0 approximately in 16 frames  [255 181 129  92  65  46  33  23  16  12   8   6   4   3]
 
   // lead wave counter
   reg [4:0] note_freq;
@@ -50,7 +50,7 @@ module sound_module(
 
       // square wave
       if (x == 0) begin
-        if (note_counter > note_freq && note_freq != 0) begin
+        if (note_counter > {3'b000, note_freq} && note_freq != 0) begin
           note_counter <= 0;
           note <= ~note;
         end else begin
