@@ -86,17 +86,46 @@ module tt_um_goose(
     // background
     wire in_bg = (!pixel_index[2] && !pixel_index[1] && !pixel_index[0]) || !in_shape;
 
-    wire [1:0] bg_r;
-    wire [1:0] bg_g;
-    wire [1:0] bg_b;
+    reg [1:0] bg_r;
+    reg [1:0] bg_g;
+    reg [1:0] bg_b;
+
+    wire [1:0] bg_r_grass;
+    wire [1:0] bg_g_grass;
+    wire [1:0] bg_b_grass;
 
     grass_bg grass_bg_inst (
         .pix_x(pix_x),
         .pix_y(pix_y),
-        .r(bg_r),
-        .g(bg_g),
-        .b(bg_b)
+        .r(bg_r_grass),
+        .g(bg_g_grass),
+        .b(bg_b_grass)
     );
+
+    always @(*) begin
+        case (ui_in[1:0])
+            2'b00: begin
+                bg_r <= bg_r_grass;
+                bg_g <= bg_g_grass;
+                bg_b <= bg_b_grass;
+            end
+            2'b01: begin
+                bg_r <= 2'b01;
+                bg_g <= 2'b01;
+                bg_b <= 2'b01;
+            end
+            2'b10: begin
+                bg_r <= 2'b00;
+                bg_g <= 2'b01;
+                bg_b <= 2'b11;
+            end
+            2'b11: begin
+                bg_r <= 2'b00;
+                bg_g <= 2'b11;
+                bg_b <= 2'b01;
+            end
+        endcase
+    end
 
     palette_lut palette_inst (
         .index(pixel_index),
