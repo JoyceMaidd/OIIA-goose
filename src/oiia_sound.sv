@@ -22,9 +22,10 @@ module sound_module(
   wire [1:0] note_freq_sel;
 
   // lead notes
+  wire [3:0] note_in = timer[5:2];           // 16 notes, 4 frames per note each. 64 frames total, ~2 seconds
     assign note_freq_sel[0] = !(note_in[0] ^ note_in[1]) && note_in[2];
     assign note_freq_sel[1] = (!note_in[0] & note_in[1]) || (!note_in[2] & note_in[3]) || (!note_in[0] & !note_in[1]) || (note_in[1] & !note_in[2] & !note_in[3]);
-    
+
   always @(*) begin
     case (note_freq_sel)
       2'd0: note_freq = 5'd0;
