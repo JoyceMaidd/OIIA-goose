@@ -74,8 +74,8 @@ initial begin
     uw_frame[1][33] = 1'b1;
     uw_frame[1][34] = 1'b1;
     uw_frame[1][35] = 1'b1;
-    uw_frame[1][36] = 1'1;
-    
+    uw_frame[1][36] = 1'b1;
+
     uw_frame[2][0] = 1'b1;
     uw_frame[2][1] = 1'b1;
     uw_frame[2][2] = 1'b1;
