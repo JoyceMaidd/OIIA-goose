@@ -5,7 +5,7 @@
 SIM ?= icarus
 TOPLEVEL_LANG ?= verilog
 SRC_DIR = $(PWD)/../src
-PROJECT_SOURCES = project.sv hvsync_generator.sv palette_lut.sv frame_lut.sv grass_bg.sv oiia_sound.sv
+PROJECT_SOURCES = project.sv hvsync_generator.sv palette_lut.sv frame_lut.sv grass_bg.sv oiia_sound.sv uw_bouncing.sv
 
 ifneq ($(GATES),yes)
 

@@ -94,12 +94,26 @@ module tt_um_goose(
     wire [1:0] bg_g_grass;
     wire [1:0] bg_b_grass;
 
+    wire [1:0] bg_r_uw;
+    wire [1:0] bg_g_uw;
+    wire [1:0] bg_b_uw;
+
     grass_bg grass_bg_inst (
         .pix_x(pix_x),
         .pix_y(pix_y),
         .r(bg_r_grass),
         .g(bg_g_grass),
         .b(bg_b_grass)
+    );
+
+    uw_bouncing uw_bouncing_inst (
+        .clk(clk),
+        .rst_n(rst_n),
+        .pix_x(pix_x),
+        .pix_y(pix_y),
+        .r(bg_r_uw),
+        .g(bg_g_uw),
+        .b(bg_b_uw)
     );
 
     always @(*) begin
@@ -110,9 +124,9 @@ module tt_um_goose(
                 bg_b <= bg_b_grass;
             end
             2'b01: begin
-                bg_r <= 2'b01;
-                bg_g <= 2'b01;
-                bg_b <= 2'b01;
+                bg_r = bg_r_uw;
+                bg_g = bg_g_uw;
+                bg_b = bg_b_uw;
             end
             2'b10: begin
                 bg_r <= 2'b00;
