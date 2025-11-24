@@ -65,10 +65,11 @@ module tt_um_goose(
         endcase
     end
 
+    wire [9:0] vert_pos = pix_y - 50;
 
     frame_lut frame_inst (
         .x(pix_x[7:3]),
-        .y(pix_y[7:3]),
+        .y(vert_pos[7:3]),
         .pixel0(pixel_index0),
         .pixel1(pixel_index1),
         .pixel2(pixel_index2),
@@ -82,6 +83,21 @@ module tt_um_goose(
     //------------------------------------------------------------
     wire [1:0] pal_r, pal_g, pal_b;
 
+    // background
+    wire in_bg = (!pixel_index[2] && !pixel_index[1] && !pixel_index[0]) || !in_shape;
+
+    wire [1:0] bg_r;
+    wire [1:0] bg_g;
+    wire [1:0] bg_b;
+
+    grass_bg grass_bg_inst (
+        .pix_x(pix_x),
+        .pix_y(pix_y),
+        .r(bg_r),
+        .g(bg_g),
+        .b(bg_b)
+    );
+
     palette_lut palette_inst (
         .index(pixel_index),
         .subpixel(pix_x[1:0] ^ pix_y[1:0]), // Dithering (blending colours using subpixels)
@@ -93,13 +109,9 @@ module tt_um_goose(
     //------------------------------------------------------------
     // Drive video
     //------------------------------------------------------------
-    // assign R = video_active ? in_shape ? pal_r : (pix_x == frame_num * 100) ? 2'b11 : 2'b00 : 2'b00;
-    // assign G = video_active ? in_shape ? pal_g : (pix_x == frame_num * 100) ? 2'b11 : 2'b00 : 2'b00;
-    // assign B = video_active ? in_shape ? pal_b : (pix_x == frame_num * 100) ? 2'b11 : 2'b00 : 2'b00;
-
-    assign R = video_active ? in_shape ? pal_r : 2'b00 : 2'b00;
-    assign G = video_active ? in_shape ? pal_g : 2'b00 : 2'b00;
-    assign B = video_active ? in_shape ? pal_b : 2'b00 : 2'b00;
+    assign R = video_active ? in_bg ? bg_r : pal_r : 2'b00;
+    assign G = video_active ? in_bg ? bg_g : pal_g : 2'b00;
+    assign B = video_active ? in_bg ? bg_b : pal_b : 2'b00;
 
     reg [5:0] frame_counter;
     reg [1:0] frame_num;
