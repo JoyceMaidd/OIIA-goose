@@ -18,11 +18,11 @@ module tt_um_goose(
     wire [1:0] R, G, B;
     wire video_active;
     wire [9:0] pix_x, pix_y;
+    wire sound;
 
     assign uo_out = {hsync, B[0], G[0], R[0], vsync, B[1], G[1], R[1]};
-
-    assign uio_out = 0;
-    assign uio_oe  = 0;
+    assign uio_out = {sound, 7'b0};
+    assign uio_oe  = 8'hff;
 
     wire _unused_ok = &{ena, ui_in, uio_in};
 
@@ -106,6 +106,18 @@ module tt_um_goose(
         .b(pal_b)
     );
 
+    // -----------------------------------------------------------
+    // Sound
+    // -----------------------------------------------------------
+    sound_module sound_inst(
+        .clk(clk),
+        .rst_n(rst_n),
+        .frame_counter(frame_counter),
+        .x(pix_x),
+        .y(pix_y),
+        .sound(sound)
+    );
+
     //------------------------------------------------------------
     // Drive video
     //------------------------------------------------------------
@@ -113,7 +125,7 @@ module tt_um_goose(
     assign G = video_active ? in_bg ? bg_g : pal_g : 2'b00;
     assign B = video_active ? in_bg ? bg_b : pal_b : 2'b00;
 
-    reg [5:0] frame_counter;
+    reg [6:0] frame_counter;
     reg [1:0] frame_num;
 
     always @(posedge clk or negedge rst_n) begin
@@ -121,11 +133,12 @@ module tt_um_goose(
             frame_counter <= 0;
             frame_num <= 0;
         end else begin
-            if (frame_counter == 10) begin
-                frame_counter <= 0;
-                frame_num <= frame_num + 1;
-            end else if (pix_x == 0 && pix_y == 0) begin
+            if (pix_x == 0 && pix_y == 0) begin
                 frame_counter <= frame_counter + 1;
+                
+                if (frame_counter[2] & !frame_counter[1] & !frame_counter[0]) begin
+                    frame_num <= frame_num + 1;
+                end
             end
         end
     end

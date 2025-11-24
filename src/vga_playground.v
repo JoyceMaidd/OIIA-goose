@@ -18,11 +18,11 @@ module tt_um_vga_example(
     wire [1:0] R, G, B;
     wire video_active;
     wire [9:0] pix_x, pix_y;
+    wire sound;
 
     assign uo_out = {hsync, B[0], G[0], R[0], vsync, B[1], G[1], R[1]};
-
-    assign uio_out = 0;
-    assign uio_oe  = 0;
+    assign uio_out = {sound, 7'b0};
+    assign uio_oe  = 8'hff;
 
     wire _unused_ok = &{ena, ui_in, uio_in};
 
@@ -65,10 +65,11 @@ module tt_um_vga_example(
         endcase
     end
 
+    wire [9:0] vert_pos = pix_y - 50;
 
     frame0_lut frame0 (
         .x(pix_x[7:3]),
-        .y(pix_y[7:3]),
+        .y(vert_pos[7:3]),
         .pixel0(pixel_index0),
         .pixel1(pixel_index1),
         .pixel2(pixel_index2),
@@ -105,6 +106,16 @@ module tt_um_vga_example(
         .b(bg_b)
     );
 
+
+  sound_module sound_inst(
+    .clk(clk),
+    .rst_n(rst_n),
+    .frame_counter(frame_counter),
+    .x(pix_x),
+    .y(pix_y),
+    .sound(sound)
+);
+
     //------------------------------------------------------------
     // Drive video
     //------------------------------------------------------------
@@ -116,7 +127,7 @@ module tt_um_vga_example(
     assign G = video_active ? in_bg ? bg_g : pal_g : 2'b00;
     assign B = video_active ? in_bg ? bg_b : pal_b : 2'b00;
 
-    reg [5:0] frame_counter;
+    reg [6:0] frame_counter;
     reg [1:0] frame_num;
 
     always @(posedge clk or negedge rst_n) begin
@@ -124,11 +135,12 @@ module tt_um_vga_example(
             frame_counter <= 0;
             frame_num <= 0;
         end else begin
-            if (frame_counter == 10) begin
-                frame_counter <= 0;
-                frame_num <= frame_num + 1;
-            end else if (pix_x == 0 && pix_y == 0) begin
+            if (pix_x == 0 && pix_y == 0) begin
                 frame_counter <= frame_counter + 1;
+                
+                if (frame_counter[2] & !frame_counter[1] & !frame_counter[0]) begin
+                    frame_num <= frame_num + 1;
+                end
             end
         end
     end
@@ -293,10 +305,73 @@ module grass_bg(
   wire in_all_grass = inside_grass_shape_1 || in_grass_base;
 
   // Output colors
+  assign r = in_all_grass ? 2'b00 : 2'b00;
+  assign g = in_all_grass ? 2'b11 : 2'b10;
+  assign b = in_all_grass ? 2'b00 : 2'b11;
+  
+endmodule
+
+module sound_module(
+  input wire clk,
+  input wire rst_n,
+  input wire[6:0] frame_counter,
+  input wire[9:0] x,
+  input wire[9:0]y,
+  output wire sound
+);
+
+  wire [6:0] timer = frame_counter;
+  
+  reg part1;
+
+  wire [4:0] envelopeB = 5'd31 - timer[1:0] << 3;// exp(t*-20) decays to 0 approximately in 16 frames  [255 181 129  92  65  46  33  23  16  12   8   6   4   3]
+
+  // lead wave counter
+  reg [4:0] note_freq;
+  reg [7:0] note_counter;
+  reg       note;
+
+  wire [1:0] note_freq_sel;
+
+  // lead notes
+  wire [3:0] note_in = timer[5:2];           // 16 notes, 4 frames per note each. 64 frames total, ~2 seconds
+  always @(note_in) begin
+    note_freq_sel[0] = !(note_in[0] ^ note_in[1]) && note_in[2];
+    note_freq_sel[1] = (!note_in[0] & note_in[1]) || (!note_in[2] & note_in[3]) || (!note_in[0] & !note_in[1]) || (note_in[1] & !note_in[2] & !note_in[3]);
+  end
+  
   always @(*) begin
-    r = in_all_grass ? 2'b00 : 2'b00;
-    g = in_all_grass ? 2'b11 : 2'b10;
-    b = in_all_grass ? 2'b00 : 2'b11;
+    case (note_freq_sel)
+      2'd0: note_freq = 5'd0;
+      2'd1: note_freq = 5'd28;
+      2'd2: note_freq = 5'd25;
+      2'd3: note_freq = 5'd24;
+    endcase
+  end
+
+  wire lead = note & (x >= 256 && x < 256 + (envelopeB<<3));   // ROM square wave with quarter second envelope
+
+  assign sound = { lead && part1 };
+
+  always @(posedge clk) begin
+    if (~rst_n) begin
+      note_counter <= 0;
+      note <= 0;
+      part1 <= 1;
+
+    end else begin
+      part1 <= timer[6];
+
+      // square wave
+      if (x == 0) begin
+        if (note_counter > note_freq && note_freq != 0) begin
+          note_counter <= 0;
+          note <= ~note;
+        end else begin
+          note_counter <= note_counter + 1'b1;
+        end
+      end
+    end
   end
 endmodule
 
