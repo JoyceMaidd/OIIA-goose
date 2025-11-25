@@ -76,6 +76,9 @@ module tt_um_goose(
         .pixel3(pixel_index3)
     );
 
+    // background
+    wire in_bg = (!pixel_index[2] && !pixel_index[1] && !pixel_index[0]) || !in_shape;
+
     //------------------------------------------------------------
     // PALETTE LOOKUP
     //

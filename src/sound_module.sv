@@ -1,6 +1,6 @@
 `default_nettype none
 
-module sound_module_mod(
+module sound_module(
   input wire clk,
   input wire rst_n,
   input wire[6:0] frame_counter,
