@@ -1,0 +1,539 @@
+`default_nettype none
+
+module uw_bouncing(
+    input wire clk,      // clock
+    input wire rst_n,    // reset_n - low to reset
+    input wire [9:0] pix_x,
+    input wire [9:0] pix_y,
+    output wire [1:0] r,
+    output wire [1:0] g,
+    output wire [1:0] b
+);
+
+    reg uw_frame [0:11][0:36];
+    initial begin
+        uw_frame[0][0] = 1'b1;
+        uw_frame[0][1] = 1'b1;
+        uw_frame[0][2] = 1'b1;
+        uw_frame[0][3] = 1'b1;
+        uw_frame[0][4] = 1'b0;
+        uw_frame[0][5] = 1'b0;
+        uw_frame[0][6] = 1'b0;
+        uw_frame[0][7] = 1'b0;
+        uw_frame[0][8] = 1'b0;
+        uw_frame[0][9] = 1'b0;
+        uw_frame[0][10] = 1'b0;
+        uw_frame[0][11] = 1'b1;
+        uw_frame[0][12] = 1'b1;
+        uw_frame[0][13] = 1'b1;
+        uw_frame[0][14] = 1'b1;
+        uw_frame[0][15] = 1'b0;
+        uw_frame[0][16] = 1'b1;
+        uw_frame[0][17] = 1'b1;
+        uw_frame[0][18] = 1'b1;
+        uw_frame[0][19] = 1'b1;
+        uw_frame[0][20] = 1'b0;
+        uw_frame[0][21] = 1'b0;
+        uw_frame[0][22] = 1'b0;
+        uw_frame[0][23] = 1'b0;
+        uw_frame[0][24] = 1'b0;
+        uw_frame[0][25] = 1'b0;
+        uw_frame[0][26] = 1'b0;
+        uw_frame[0][27] = 1'b0;
+        uw_frame[0][28] = 1'b0;
+        uw_frame[0][29] = 1'b0;
+        uw_frame[0][30] = 1'b0;
+        uw_frame[0][31] = 1'b0;
+        uw_frame[0][32] = 1'b0;
+        uw_frame[0][33] = 1'b1;
+        uw_frame[0][34] = 1'b1;
+        uw_frame[0][35] = 1'b1;
+        uw_frame[0][36] = 1'b1;
+
+        uw_frame[1][0] = 1'b1;
+        uw_frame[1][1] = 1'b1;
+        uw_frame[1][2] = 1'b1;
+        uw_frame[1][3] = 1'b1;
+        uw_frame[1][4] = 1'b0;
+        uw_frame[1][5] = 1'b0;
+        uw_frame[1][6] = 1'b0;
+        uw_frame[1][7] = 1'b0;
+        uw_frame[1][8] = 1'b0;
+        uw_frame[1][9] = 1'b0;
+        uw_frame[1][10] = 1'b0;
+        uw_frame[1][11] = 1'b1;
+        uw_frame[1][12] = 1'b1;
+        uw_frame[1][13] = 1'b1;
+        uw_frame[1][14] = 1'b1;
+        uw_frame[1][15] = 1'b0;
+        uw_frame[1][16] = 1'b1;
+        uw_frame[1][17] = 1'b1;
+        uw_frame[1][18] = 1'b1;
+        uw_frame[1][19] = 1'b1;
+        uw_frame[1][20] = 1'b0;
+        uw_frame[1][21] = 1'b0;
+        uw_frame[1][22] = 1'b0;
+        uw_frame[1][23] = 1'b0;
+        uw_frame[1][24] = 1'b0;
+        uw_frame[1][25] = 1'b0;
+        uw_frame[1][26] = 1'b0;
+        uw_frame[1][27] = 1'b0;
+        uw_frame[1][28] = 1'b0;
+        uw_frame[1][29] = 1'b0;
+        uw_frame[1][30] = 1'b0;
+        uw_frame[1][31] = 1'b0;
+        uw_frame[1][32] = 1'b0;
+        uw_frame[1][33] = 1'b1;
+        uw_frame[1][34] = 1'b1;
+        uw_frame[1][35] = 1'b1;
+        uw_frame[1][36] = 1'b1;
+        
+        uw_frame[2][0] = 1'b1;
+        uw_frame[2][1] = 1'b1;
+        uw_frame[2][2] = 1'b1;
+        uw_frame[2][3] = 1'b1;
+        uw_frame[2][4] = 1'b0;
+        uw_frame[2][5] = 1'b0;
+        uw_frame[2][6] = 1'b0;
+        uw_frame[2][7] = 1'b0;
+        uw_frame[2][8] = 1'b0;
+        uw_frame[2][9] = 1'b0;
+        uw_frame[2][10] = 1'b0;
+        uw_frame[2][11] = 1'b1;
+        uw_frame[2][12] = 1'b1;
+        uw_frame[2][13] = 1'b1;
+        uw_frame[2][14] = 1'b1;
+        uw_frame[2][15] = 1'b0;
+        uw_frame[2][16] = 1'b1;
+        uw_frame[2][17] = 1'b1;
+        uw_frame[2][18] = 1'b1;
+        uw_frame[2][19] = 1'b1;
+        uw_frame[2][20] = 1'b0;
+        uw_frame[2][21] = 1'b0;
+        uw_frame[2][22] = 1'b0;
+        uw_frame[2][23] = 1'b0;
+        uw_frame[2][24] = 1'b0;
+        uw_frame[2][25] = 1'b1;
+        uw_frame[2][26] = 1'b1;
+        uw_frame[2][27] = 1'b1;
+        uw_frame[2][28] = 1'b0;
+        uw_frame[2][29] = 1'b0;
+        uw_frame[2][30] = 1'b0;
+        uw_frame[2][31] = 1'b0;
+        uw_frame[2][32] = 1'b0;
+        uw_frame[2][33] = 1'b1;
+        uw_frame[2][34] = 1'b1;
+        uw_frame[2][35] = 1'b1;
+        uw_frame[2][36] = 1'b1;
+
+        uw_frame[3][0] = 1'b1;
+        uw_frame[3][1] = 1'b1;
+        uw_frame[3][2] = 1'b1;
+        uw_frame[3][3] = 1'b1;
+        uw_frame[3][4] = 1'b0;
+        uw_frame[3][5] = 1'b0;
+        uw_frame[3][6] = 1'b0;
+        uw_frame[3][7] = 1'b0;
+        uw_frame[3][8] = 1'b0;
+        uw_frame[3][9] = 1'b0;
+        uw_frame[3][10] = 1'b0;
+        uw_frame[3][11] = 1'b1;
+        uw_frame[3][12] = 1'b1;
+        uw_frame[3][13] = 1'b1;
+        uw_frame[3][14] = 1'b1;
+        uw_frame[3][15] = 1'b0;
+        uw_frame[3][16] = 1'b1;
+        uw_frame[3][17] = 1'b1;
+        uw_frame[3][18] = 1'b1;
+        uw_frame[3][19] = 1'b1;
+        uw_frame[3][20] = 1'b1;
+        uw_frame[3][21] = 1'b0;
+        uw_frame[3][22] = 1'b0;
+        uw_frame[3][23] = 1'b0;
+        uw_frame[3][24] = 1'b1;
+        uw_frame[3][25] = 1'b1;
+        uw_frame[3][26] = 1'b1;
+        uw_frame[3][27] = 1'b1;
+        uw_frame[3][28] = 1'b1;
+        uw_frame[3][29] = 1'b0;
+        uw_frame[3][30] = 1'b0;
+        uw_frame[3][31] = 1'b0;
+        uw_frame[3][32] = 1'b1;
+        uw_frame[3][33] = 1'b1;
+        uw_frame[3][34] = 1'b1;
+        uw_frame[3][35] = 1'b1;
+        uw_frame[3][36] = 1'b1;
+
+        uw_frame[4][0] = 1'b1;
+        uw_frame[4][1] = 1'b1;
+        uw_frame[4][2] = 1'b1;
+        uw_frame[4][3] = 1'b1;
+        uw_frame[4][4] = 1'b0;
+        uw_frame[4][5] = 1'b0;
+        uw_frame[4][6] = 1'b0;
+        uw_frame[4][7] = 1'b0;
+        uw_frame[4][8] = 1'b0;
+        uw_frame[4][9] = 1'b0;
+        uw_frame[4][10] = 1'b0;
+        uw_frame[4][11] = 1'b1;
+        uw_frame[4][12] = 1'b1;
+        uw_frame[4][13] = 1'b1;
+        uw_frame[4][14] = 1'b1;
+        uw_frame[4][15] = 1'b0;
+        uw_frame[4][16] = 1'b0;
+        uw_frame[4][17] = 1'b1;
+        uw_frame[4][18] = 1'b1;
+        uw_frame[4][19] = 1'b1;
+        uw_frame[4][20] = 1'b1;
+        uw_frame[4][21] = 1'b0;
+        uw_frame[4][22] = 1'b0;
+        uw_frame[4][23] = 1'b0;
+        uw_frame[4][24] = 1'b1;
+        uw_frame[4][25] = 1'b1;
+        uw_frame[4][26] = 1'b1;
+        uw_frame[4][27] = 1'b1;
+        uw_frame[4][28] = 1'b1;
+        uw_frame[4][29] = 1'b0;
+        uw_frame[4][30] = 1'b0;
+        uw_frame[4][31] = 1'b0;
+        uw_frame[4][32] = 1'b1;
+        uw_frame[4][33] = 1'b1;
+        uw_frame[4][34] = 1'b1;
+        uw_frame[4][35] = 1'b1;
+        uw_frame[4][36] = 1'b0;
+
+        uw_frame[5][0] = 1'b0;
+        uw_frame[5][1] = 1'b1;
+        uw_frame[5][2] = 1'b1;
+        uw_frame[5][3] = 1'b1;
+        uw_frame[5][4] = 1'b1;
+        uw_frame[5][5] = 1'b0;
+        uw_frame[5][6] = 1'b0;
+        uw_frame[5][7] = 1'b0;
+        uw_frame[5][8] = 1'b0;
+        uw_frame[5][9] = 1'b0;
+        uw_frame[5][10] = 1'b1;
+        uw_frame[5][11] = 1'b1;
+        uw_frame[5][12] = 1'b1;
+        uw_frame[5][13] = 1'b1;
+        uw_frame[5][14] = 1'b0;
+        uw_frame[5][15] = 1'b0;
+        uw_frame[5][16] = 1'b0;
+        uw_frame[5][17] = 1'b1;
+        uw_frame[5][18] = 1'b1;
+        uw_frame[5][19] = 1'b1;
+        uw_frame[5][20] = 1'b1;
+        uw_frame[5][21] = 1'b1;
+        uw_frame[5][22] = 1'b0;
+        uw_frame[5][23] = 1'b1;
+        uw_frame[5][24] = 1'b1;
+        uw_frame[5][25] = 1'b1;
+        uw_frame[5][26] = 1'b1;
+        uw_frame[5][27] = 1'b1;
+        uw_frame[5][28] = 1'b1;
+        uw_frame[5][29] = 1'b1;
+        uw_frame[5][30] = 1'b0;
+        uw_frame[5][31] = 1'b1;
+        uw_frame[5][32] = 1'b1;
+        uw_frame[5][33] = 1'b1;
+        uw_frame[5][34] = 1'b1;
+        uw_frame[5][35] = 1'b1;
+        uw_frame[5][36] = 1'b0;
+
+        uw_frame[6][0] = 1'b0;
+        uw_frame[6][1] = 1'b1;
+        uw_frame[6][2] = 1'b1;
+        uw_frame[6][3] = 1'b1;
+        uw_frame[6][4] = 1'b1;
+        uw_frame[6][5] = 1'b0;
+        uw_frame[6][6] = 1'b0;
+        uw_frame[6][7] = 1'b0;
+        uw_frame[6][8] = 1'b0;
+        uw_frame[6][9] = 1'b0;
+        uw_frame[6][10] = 1'b1;
+        uw_frame[6][11] = 1'b1;
+        uw_frame[6][12] = 1'b1;
+        uw_frame[6][13] = 1'b1;
+        uw_frame[6][14] = 1'b0;
+        uw_frame[6][15] = 1'b0;
+        uw_frame[6][16] = 1'b0;
+        uw_frame[6][17] = 1'b0;
+        uw_frame[6][18] = 1'b1;
+        uw_frame[6][19] = 1'b1;
+        uw_frame[6][20] = 1'b1;
+        uw_frame[6][21] = 1'b1;
+        uw_frame[6][22] = 1'b0;
+        uw_frame[6][23] = 1'b1;
+        uw_frame[6][24] = 1'b1;
+        uw_frame[6][25] = 1'b1;
+        uw_frame[6][26] = 1'b1;
+        uw_frame[6][27] = 1'b1;
+        uw_frame[6][28] = 1'b1;
+        uw_frame[6][29] = 1'b1;
+        uw_frame[6][30] = 1'b0;
+        uw_frame[6][31] = 1'b1;
+        uw_frame[6][32] = 1'b1;
+        uw_frame[6][33] = 1'b1;
+        uw_frame[6][34] = 1'b1;
+        uw_frame[6][35] = 1'b0;
+        uw_frame[6][36] = 1'b0;
+
+        uw_frame[7][0] = 1'b0;
+        uw_frame[7][1] = 1'b1;
+        uw_frame[7][2] = 1'b1;
+        uw_frame[7][3] = 1'b1;
+        uw_frame[7][4] = 1'b1;
+        uw_frame[7][5] = 1'b1;
+        uw_frame[7][6] = 1'b0;
+        uw_frame[7][7] = 1'b0;
+        uw_frame[7][8] = 1'b0;
+        uw_frame[7][9] = 1'b1;
+        uw_frame[7][10] = 1'b1;
+        uw_frame[7][11] = 1'b1;
+        uw_frame[7][12] = 1'b1;
+        uw_frame[7][13] = 1'b1;
+        uw_frame[7][14] = 1'b0;
+        uw_frame[7][15] = 1'b0;
+        uw_frame[7][16] = 1'b0;
+        uw_frame[7][17] = 1'b0;
+        uw_frame[7][18] = 1'b1;
+        uw_frame[7][19] = 1'b1;
+        uw_frame[7][20] = 1'b1;
+        uw_frame[7][21] = 1'b1;
+        uw_frame[7][22] = 1'b1;
+        uw_frame[7][23] = 1'b1;
+        uw_frame[7][24] = 1'b1;
+        uw_frame[7][25] = 1'b1;
+        uw_frame[7][26] = 1'b0;
+        uw_frame[7][27] = 1'b1;
+        uw_frame[7][28] = 1'b1;
+        uw_frame[7][29] = 1'b1;
+        uw_frame[7][30] = 1'b1;
+        uw_frame[7][31] = 1'b1;
+        uw_frame[7][32] = 1'b1;
+        uw_frame[7][33] = 1'b1;
+        uw_frame[7][34] = 1'b1;
+        uw_frame[7][35] = 1'b0;
+        uw_frame[7][36] = 1'b0;
+
+        uw_frame[8][0] = 1'b0;
+        uw_frame[8][1] = 1'b0;
+        uw_frame[8][2] = 1'b1;
+        uw_frame[8][3] = 1'b1;
+        uw_frame[8][4] = 1'b1;
+        uw_frame[8][5] = 1'b1;
+        uw_frame[8][6] = 1'b0;
+        uw_frame[8][7] = 1'b0;
+        uw_frame[8][8] = 1'b0;
+        uw_frame[8][9] = 1'b1;
+        uw_frame[8][10] = 1'b1;
+        uw_frame[8][11] = 1'b1;
+        uw_frame[8][12] = 1'b1;
+        uw_frame[8][13] = 1'b0;
+        uw_frame[8][14] = 1'b0;
+        uw_frame[8][15] = 1'b0;
+        uw_frame[8][16] = 1'b0;
+        uw_frame[8][17] = 1'b0;
+        uw_frame[8][18] = 1'b0;
+        uw_frame[8][19] = 1'b1;
+        uw_frame[8][20] = 1'b1;
+        uw_frame[8][21] = 1'b1;
+        uw_frame[8][22] = 1'b1;
+        uw_frame[8][23] = 1'b1;
+        uw_frame[8][24] = 1'b1;
+        uw_frame[8][25] = 1'b0;
+        uw_frame[8][26] = 1'b0;
+        uw_frame[8][27] = 1'b0;
+        uw_frame[8][28] = 1'b1;
+        uw_frame[8][29] = 1'b1;
+        uw_frame[8][30] = 1'b1;
+        uw_frame[8][31] = 1'b1;
+        uw_frame[8][32] = 1'b1;
+        uw_frame[8][33] = 1'b1;
+        uw_frame[8][34] = 1'b0;
+        uw_frame[8][35] = 1'b0;
+        uw_frame[8][36] = 1'b0;
+
+        uw_frame[9][0] = 1'b0;
+        uw_frame[9][1] = 1'b0;
+        uw_frame[9][2] = 1'b1;
+        uw_frame[9][3] = 1'b1;
+        uw_frame[9][4] = 1'b1;
+        uw_frame[9][5] = 1'b1;
+        uw_frame[9][6] = 1'b1;
+        uw_frame[9][7] = 1'b1;
+        uw_frame[9][8] = 1'b1;
+        uw_frame[9][9] = 1'b1;
+        uw_frame[9][10] = 1'b1;
+        uw_frame[9][11] = 1'b1;
+        uw_frame[9][12] = 1'b1;
+        uw_frame[9][13] = 1'b0;
+        uw_frame[9][14] = 1'b0;
+        uw_frame[9][15] = 1'b0;
+        uw_frame[9][16] = 1'b0;
+        uw_frame[9][17] = 1'b0;
+        uw_frame[9][18] = 1'b0;
+        uw_frame[9][19] = 1'b0;
+        uw_frame[9][20] = 1'b1;
+        uw_frame[9][21] = 1'b1;
+        uw_frame[9][22] = 1'b1;
+        uw_frame[9][23] = 1'b1;
+        uw_frame[9][24] = 1'b1;
+        uw_frame[9][25] = 1'b0;
+        uw_frame[9][26] = 1'b0;
+        uw_frame[9][27] = 1'b0;
+        uw_frame[9][28] = 1'b1;
+        uw_frame[9][29] = 1'b1;
+        uw_frame[9][30] = 1'b1;
+        uw_frame[9][31] = 1'b1;
+        uw_frame[9][32] = 1'b1;
+        uw_frame[9][33] = 1'b0;
+        uw_frame[9][34] = 1'b0;
+        uw_frame[9][35] = 1'b0;
+        uw_frame[9][36] = 1'b0;
+
+        uw_frame[10][0] = 1'b0;
+        uw_frame[10][1] = 1'b0;
+        uw_frame[10][2] = 1'b0;
+        uw_frame[10][3] = 1'b1;
+        uw_frame[10][4] = 1'b1;
+        uw_frame[10][5] = 1'b1;
+        uw_frame[10][6] = 1'b1;
+        uw_frame[10][7] = 1'b1;
+        uw_frame[10][8] = 1'b1;
+        uw_frame[10][9] = 1'b1;
+        uw_frame[10][10] = 1'b1;
+        uw_frame[10][11] = 1'b1;
+        uw_frame[10][12] = 1'b0;
+        uw_frame[10][13] = 1'b0;
+        uw_frame[10][14] = 1'b0;
+        uw_frame[10][15] = 1'b0;
+        uw_frame[10][16] = 1'b0;
+        uw_frame[10][17] = 1'b0;
+        uw_frame[10][18] = 1'b0;
+        uw_frame[10][19] = 1'b0;
+        uw_frame[10][20] = 1'b1;
+        uw_frame[10][21] = 1'b1;
+        uw_frame[10][22] = 1'b1;
+        uw_frame[10][23] = 1'b1;
+        uw_frame[10][24] = 1'b0;
+        uw_frame[10][25] = 1'b0;
+        uw_frame[10][26] = 1'b0;
+        uw_frame[10][27] = 1'b0;
+        uw_frame[10][28] = 1'b0;
+        uw_frame[10][29] = 1'b1;
+        uw_frame[10][30] = 1'b1;
+        uw_frame[10][31] = 1'b1;
+        uw_frame[10][32] = 1'b1;
+        uw_frame[10][33] = 1'b0;
+        uw_frame[10][34] = 1'b0;
+        uw_frame[10][35] = 1'b0;
+        uw_frame[10][36] = 1'b0;
+
+        uw_frame[11][0] = 1'b0;
+        uw_frame[11][1] = 1'b0;
+        uw_frame[11][2] = 1'b0;
+        uw_frame[11][3] = 1'b0;
+        uw_frame[11][4] = 1'b1;
+        uw_frame[11][5] = 1'b1;
+        uw_frame[11][6] = 1'b1;
+        uw_frame[11][7] = 1'b1;
+        uw_frame[11][8] = 1'b1;
+        uw_frame[11][9] = 1'b1;
+        uw_frame[11][10] = 1'b1;
+        uw_frame[11][11] = 1'b0;
+        uw_frame[11][12] = 1'b0;
+        uw_frame[11][13] = 1'b0;
+        uw_frame[11][14] = 1'b0;
+        uw_frame[11][15] = 1'b0;
+        uw_frame[11][16] = 1'b0;
+        uw_frame[11][17] = 1'b0;
+        uw_frame[11][18] = 1'b0;
+        uw_frame[11][19] = 1'b0;
+        uw_frame[11][20] = 1'b0;
+        uw_frame[11][21] = 1'b1;
+        uw_frame[11][22] = 1'b1;
+        uw_frame[11][23] = 1'b0;
+        uw_frame[11][24] = 1'b0;
+        uw_frame[11][25] = 1'b0;
+        uw_frame[11][26] = 1'b0;
+        uw_frame[11][27] = 1'b0;
+        uw_frame[11][28] = 1'b0;
+        uw_frame[11][29] = 1'b0;
+        uw_frame[11][30] = 1'b1;
+        uw_frame[11][31] = 1'b1;
+        uw_frame[11][32] = 1'b0;
+        uw_frame[11][33] = 1'b0;
+        uw_frame[11][34] = 1'b0;
+        uw_frame[11][35] = 1'b0;
+        uw_frame[11][36] = 1'b0;
+    end
+
+    // Define square position and size
+    localparam SCREEN_PADDING = 32;
+    localparam UW_REC_WIDTH = 37;
+    localparam UW_REC_HEIGHT = 12;
+    
+    reg uw_x_dir_right = 1;
+    reg uw_y_dir_down = 1;
+
+    reg [9:0] uw_x_pos;
+    reg [9:0] uw_y_pos;
+    
+    wire [9:0] uw_right_edge;
+    wire [9:0] uw_bot_edge;
+    assign uw_right_edge = uw_x_pos + UW_REC_WIDTH;
+    assign uw_bot_edge = uw_y_pos + UW_REC_HEIGHT;
+    
+    wire in_logo;
+    assign in_logo = (pix_x >= uw_x_pos) && (pix_x < uw_x_pos + UW_REC_WIDTH) && 
+        (pix_y >= uw_y_pos) && (pix_y < uw_y_pos + UW_REC_HEIGHT);
+
+    wire [9:0] uw_x = pix_x - uw_x_pos;
+    wire [9:0] uw_y = pix_y - uw_y_pos;
+    wire colour = uw_frame[uw_y][uw_x];
+
+    assign r = in_logo ? {!colour, !colour} : 2'b11;
+    assign g = in_logo ? {!colour, !colour} : 2'b11;
+    assign b = in_logo ? {2'b00} : 2'b00;
+
+    always @(posedge clk or negedge rst_n) begin
+        if (~rst_n) begin
+            uw_x_pos <= SCREEN_PADDING;
+            uw_y_pos <= SCREEN_PADDING;
+            uw_x_dir_right <= 1'b1;
+            uw_y_dir_down  <= 1'b1;
+        end 
+        else begin
+          if (pix_x == 0 && pix_y == 0) begin
+            // Move horizontally
+            if (uw_x_dir_right) begin
+                uw_x_pos <= uw_x_pos + 1;
+            end else begin
+                uw_x_pos <= uw_x_pos - 1;
+            end
+
+            // Move vertically
+            if (uw_y_dir_down) begin
+                uw_y_pos <= uw_y_pos + 1;
+            end else begin
+                uw_y_pos <= uw_y_pos - 1;
+            end
+
+            // Bounce off edges
+            if (uw_right_edge[9] && uw_right_edge[6]) begin
+                uw_x_dir_right <= 1'b0; // move left
+            end else if (!uw_x_pos[9] & !uw_x_pos[8] & !uw_x_pos[7] & !uw_x_pos[6] & !uw_x_pos[5]) begin
+                uw_x_dir_right <= 1'b1; // move right
+            end
+
+            if (uw_bot_edge[8] && uw_bot_edge[7] && uw_bot_edge[6]) begin
+                uw_y_dir_down <= 1'b0;  // move up
+            end else if (!uw_y_pos[9] & !uw_y_pos[8] & !uw_y_pos[7] & !uw_y_pos[6] & !uw_y_pos[5]) begin
+                uw_y_dir_down <= 1'b1;  // move down
+            end
+          end
+        end
+    end
+  
+endmodule
