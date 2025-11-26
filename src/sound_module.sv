@@ -1,3 +1,8 @@
+// Sound module
+// - Creates a periodic square-wave "lead" voice whose frequency is
+//   chosen from a small lookup controlled by `frame_counter` (timer).
+// - Applies a coarse envelope and bounds the audible region by X
+//   coordinate so that the sound can be tied to on-screen content.
 `default_nettype none
 
 module sound_module(
@@ -5,7 +10,7 @@ module sound_module(
   input wire rst_n,
   input wire[6:0] frame_counter,
   input wire[9:0] x,
-  input wire[9:0]y,
+  input wire[9:0] y,
   output wire sound
 );
 

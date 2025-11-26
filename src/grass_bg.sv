@@ -1,3 +1,4 @@
+// Grass background generator
 module grass_bg(
   input wire [9:0] pix_x,
   input wire [9:0] pix_y,

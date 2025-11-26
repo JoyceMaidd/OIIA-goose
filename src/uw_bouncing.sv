@@ -1,3 +1,4 @@
+// Bouncing "uw" logo generator
 `default_nettype none
 
 module uw_bouncing(

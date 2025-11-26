@@ -176,7 +176,7 @@ module tt_um_vga_example(
             if (pix_x == 0 && pix_y == 0) begin
                 frame_counter <= frame_counter + 1;
                 
-                if (frame_counter[2] & !frame_counter[1] & !frame_counter[0]) begin
+                if (frame_counter[1] & !frame_counter[0]) begin
                     frame_num <= frame_num + 1;
                 end
             end
