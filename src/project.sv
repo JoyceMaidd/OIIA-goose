@@ -33,6 +33,13 @@ module tt_um_goose(
     assign uio_oe  = 8'hff;
 
     wire _unused_ok = &{ena, ui_in, uio_in};
+    // Speed mode selection
+    // 00 - stop
+    // 01 - slow
+    // 10 - fast
+    // 11 - default
+    wire [1:0] speed_mode;
+    assign speed_mode = ui_in[3:2];
 
     //------------------------------------------------------------
     // VGA timing generator
@@ -122,7 +129,8 @@ module tt_um_goose(
         .pix_y(pix_y),
         .r(bg_r_grass),
         .g(bg_g_grass),
-        .b(bg_b_grass)
+        .b(bg_b_grass),
+        .frame(frame_counter[3])
     );
 
     uw_bouncing uw_bouncing_inst (
@@ -187,17 +195,37 @@ module tt_um_goose(
     reg [1:0] frame_num;
 
     always @(posedge clk or negedge rst_n) begin
-        if (!rst_n) begin
-            frame_counter <= 0;
-            frame_num <= 0;
-        end else begin
-            if (pix_x == 0 && pix_y == 0) begin
-                frame_counter <= frame_counter + 1;
-                
-                if (frame_counter[1] & !frame_counter[0]) begin
-                    frame_num <= frame_num + 1;
-                end
+      if (!rst_n) begin
+          frame_counter <= 0;
+          frame_num <= 0;
+      end 
+      else begin
+        if (pix_x == 0 && pix_y == 0) begin
+          frame_counter <= frame_counter + 1;
+          
+          if (speed_mode[0]) begin
+            if (!speed_mode[1]) begin
+              // slow
+              if (frame_counter[1] & frame_counter[0]) begin
+                frame_num <= frame_num + 1;
+              end
             end
+            else begin
+              // default
+              if (frame_counter[6]) begin
+                frame_num <= frame_num + 1;
+              end
+            end
+          end
+          else begin
+            if (speed_mode[1]) begin
+              // fast
+              if (frame_counter[0]) begin
+                frame_num <= frame_num + 1;
+              end
+            end
+          end                 
         end
+      end
     end
 endmodule

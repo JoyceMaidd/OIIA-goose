@@ -25,6 +25,12 @@ module tt_um_vga_example(
     assign uio_oe  = 8'hff;
 
     wire _unused_ok = &{ena, ui_in, uio_in};
+    // 00 - stop
+    // 01 - slow
+    // 10 - fast
+    // 11 - default
+    wire [1:0] speed_mode;
+    assign speed_mode = ui_in[3:2];
 
     //------------------------------------------------------------
     // VGA timing generator
@@ -111,7 +117,8 @@ module tt_um_vga_example(
         .pix_y(pix_y),
         .r(bg_r_grass),
         .g(bg_g_grass),
-        .b(bg_b_grass)
+        .b(bg_b_grass),
+        .frame(frame_counter[3])
     );
 
     uw_bouncing uw_bouncing_inst (
@@ -169,18 +176,38 @@ module tt_um_vga_example(
     reg [1:0] frame_num;
 
     always @(posedge clk or negedge rst_n) begin
-        if (!rst_n) begin
-            frame_counter <= 0;
-            frame_num <= 0;
-        end else begin
-            if (pix_x == 0 && pix_y == 0) begin
-                frame_counter <= frame_counter + 1;
-                
-                if (frame_counter[1] & !frame_counter[0]) begin
-                    frame_num <= frame_num + 1;
-                end
+      if (!rst_n) begin
+          frame_counter <= 0;
+          frame_num <= 0;
+      end 
+      else begin
+        if (pix_x == 0 && pix_y == 0) begin
+          frame_counter <= frame_counter + 1;
+          
+          if (speed_mode[0]) begin
+            if (!speed_mode[1]) begin
+              // slow
+              if (frame_counter[1] & frame_counter[0]) begin
+                frame_num <= frame_num + 1;
+              end
             end
+            else begin
+              // default
+              if (frame_counter[6]) begin
+                frame_num <= frame_num + 1;
+              end
+            end
+          end
+          else begin
+            if (speed_mode[1]) begin
+              // fast
+              if (frame_counter[0]) begin
+                frame_num <= frame_num + 1;
+              end
+            end
+          end                 
         end
+      end
     end
 endmodule
 
@@ -860,14 +887,16 @@ module grass_bg(
   input wire [9:0] pix_y,
   output wire [1:0] r,
   output wire [1:0] g,
-  output wire [1:0] b
+  output wire [1:0] b,
+  input wire frame
 );
 
   // Local coordinates for each "grass cell"
   wire in_grass_blade_vert_region = pix_y[5] && pix_y[6] && pix_y[7];
 
   // Define curved grass shape (using quadratic approximation)
-  wire inside_grass_shape_1 = pix_x[1] && in_grass_blade_vert_region;
+  wire inside_grass_shape_1 = ((!frame & pix_x[1]) || (frame & pix_x[2])) && in_grass_blade_vert_region && 
+                              ((pix_x[4] && !pix_x[3]) || (pix_x[3] && !pix_x[4] && !pix_x[5]) || (pix_x[5] && pix_x[6]));
 
   // Draw the base layer of grass (flat bottom)
   wire in_grass_base = (pix_y[5] && pix_y[6] && pix_y[7] && pix_y[4]) || pix_y[8];
