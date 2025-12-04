@@ -1,4 +1,9 @@
 `default_nettype none
+// Top-level module
+// - Exposes video & sound signals on 8-bit I/O ports
+// - Instantiates VGA timing, frame lookup, palette lookup,
+//   background generators, and a sound generator
+// - Maintains a small frame counter and optional multi-frame selection
 
 module tt_um_goose(
     input  wire [7:0] ui_in,
@@ -13,6 +18,9 @@ module tt_um_goose(
 
     //------------------------------------------------------------
     // VGA signals
+    // The design produces separate 2-bit R,G,B signals that are
+    // later packed and driven out to the `uo_out` port. `video_active`
+    // indicates whether the current pixel is inside the visible area.
     //------------------------------------------------------------
     wire hsync, vsync;
     wire [1:0] R, G, B;
@@ -25,9 +33,17 @@ module tt_um_goose(
     assign uio_oe  = 8'hff;
 
     wire _unused_ok = &{ena, ui_in, uio_in};
+    // Speed mode selection
+    // 00 - stop
+    // 01 - slow
+    // 10 - fast
+    // 11 - default
+    wire [1:0] speed_mode;
+    assign speed_mode = ui_in[3:2];
 
     //------------------------------------------------------------
     // VGA timing generator
+    // Produces `hsync`/`vsync` and the current pixel coordinates `pix_x`/`pix_y`
     //------------------------------------------------------------
 
     hvsync_generator hvsync_gen (
@@ -41,10 +57,12 @@ module tt_um_goose(
     );
 
     //------------------------------------------------------------
-    // FRAMEBUFFER LOOKUP (frame0)
-    //
-    // You can store 2-bit or 4-bit indices per pixel.
-    // Here: 6-bit address, 4-bit output = 16-color palette
+    // FRAMEBUFFER LOOKUP
+    // The `frame_lut` converts a block X/Y into per-pixel
+    // color indices. This design exposes four separate frame outputs
+    // (`pixel_index0`..`3`) and selects one of them using `frame_num`.
+    // Each pixel index is a small logical color index used by the
+    // `palette_lut` to produce actual R/G/B values.
     //------------------------------------------------------------
     wire [2:0] pixel_index0;
     wire [2:0] pixel_index1;
@@ -76,6 +94,9 @@ module tt_um_goose(
         .pixel3(pixel_index3)
     );
 
+    // background
+    wire in_bg = (!pixel_index[2] && !pixel_index[1] && !pixel_index[0]) || !in_shape;
+
     //------------------------------------------------------------
     // PALETTE LOOKUP
     //
@@ -83,8 +104,13 @@ module tt_um_goose(
     //------------------------------------------------------------
     wire [1:0] pal_r, pal_g, pal_b;
 
-    // background
-    wire in_bg = (!pixel_index[2] && !pixel_index[1] && !pixel_index[0]) || !in_shape;
+    palette_lut palette (
+        .index(pixel_index),
+        .subpixel(pix_x[1:0] ^ pix_y[1:0]), // Dithering (blending colours using subpixels)
+        .r(pal_r),
+        .g(pal_g),
+        .b(pal_b)
+    );
 
     reg [1:0] bg_r;
     reg [1:0] bg_g;
@@ -103,7 +129,8 @@ module tt_um_goose(
         .pix_y(pix_y),
         .r(bg_r_grass),
         .g(bg_g_grass),
-        .b(bg_b_grass)
+        .b(bg_b_grass),
+        .frame(frame_counter[3])
     );
 
     uw_bouncing uw_bouncing_inst (
@@ -116,12 +143,19 @@ module tt_um_goose(
         .b(bg_b_uw)
     );
 
+    //------------------------------------------------------------
+    // `ui_in[1:0]` selects which background to use:
+    // - 00: grass background generator
+    // - 01: bouncing uw generator
+    // - 10/11: fixed hardcoded colour sets
+    //------------------------------------------------------------
+
     always @(*) begin
         case (ui_in[1:0])
             2'b00: begin
-                bg_r <= bg_r_grass;
-                bg_g <= bg_g_grass;
-                bg_b <= bg_b_grass;
+                bg_r = bg_r_grass;
+                bg_g = bg_g_grass;
+                bg_b = bg_b_grass;
             end
             2'b01: begin
                 bg_r = bg_r_uw;
@@ -129,29 +163,18 @@ module tt_um_goose(
                 bg_b = bg_b_uw;
             end
             2'b10: begin
-                bg_r <= 2'b00;
-                bg_g <= 2'b01;
-                bg_b <= 2'b11;
+                bg_r = 2'b00;
+                bg_g = 2'b01;
+                bg_b = 2'b11;
             end
             2'b11: begin
-                bg_r <= 2'b00;
-                bg_g <= 2'b11;
-                bg_b <= 2'b01;
+                bg_r = 2'b00;
+                bg_g = 2'b11;
+                bg_b = 2'b01;
             end
         endcase
     end
 
-    palette_lut palette_inst (
-        .index(pixel_index),
-        .subpixel(pix_x[1:0] ^ pix_y[1:0]), // Dithering (blending colours using subpixels)
-        .r(pal_r),
-        .g(pal_g),
-        .b(pal_b)
-    );
-
-    // -----------------------------------------------------------
-    // Sound
-    // -----------------------------------------------------------
     sound_module sound_inst(
         .clk(clk),
         .rst_n(rst_n),
@@ -172,19 +195,37 @@ module tt_um_goose(
     reg [1:0] frame_num;
 
     always @(posedge clk or negedge rst_n) begin
-        if (!rst_n) begin
-            frame_counter <= 0;
-            frame_num <= 0;
-        end else begin
-            if (pix_x == 0 && pix_y == 0) begin
-                frame_counter <= frame_counter + 1;
-                
-                if (frame_counter[2] & !frame_counter[1] & !frame_counter[0]) begin
-                    frame_num <= frame_num + 1;
-                end
+      if (!rst_n) begin
+          frame_counter <= 0;
+          frame_num <= 0;
+      end 
+      else begin
+        if (pix_x == 0 && pix_y == 0) begin
+          frame_counter <= frame_counter + 1;
+          
+          if (speed_mode[0]) begin
+            if (!speed_mode[1]) begin
+              // slow
+              if (frame_counter[1] & frame_counter[0]) begin
+                frame_num <= frame_num + 1;
+              end
             end
+            else begin
+              // default
+              if (frame_counter[6]) begin
+                frame_num <= frame_num + 1;
+              end
+            end
+          end
+          else begin
+            if (speed_mode[1]) begin
+              // fast
+              if (frame_counter[0]) begin
+                frame_num <= frame_num + 1;
+              end
+            end
+          end                 
         end
+      end
     end
-
-
 endmodule

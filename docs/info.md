@@ -13,28 +13,13 @@ Displays the OIIA goose demoscene
 
 ## How to test
 
-Build the project and generate the SVH files used by `src/graphics.sv`.
-
-1. Create a build directory and build the helper tools:
+1. Generate goose.hex and frame.svh with extract_goose.py
 
 ```sh
-mkdir -p build && cd build
-cmake ..
-cmake --build .
+python scripts/extract_goose.py
 ```
 
-2. Convert your BMP files to SVH files used by the Verilog sources. Run the `make_bitmaps` tool from the `build` directory and point the first argument at the `src` directory (this will write `palette.svh` and `frameN.svh` files into `src`):
-
-```sh
-./make_bitmaps ../src ../data/frame0.bmp ../data/frame1.bmp ../data/frame2.bmp ../data/frame3.bmp
-```
-
-- This writes `../src/palette.svh` and `../src/frame0.svh` .. `../src/frame3.svh` which are included by `src/graphics.sv`.
-
-Notes:
-
-The project currently uses 32×32 BMPs.
-- To change frame timing or number of frames, edit `src/graphics.sv` and the included `frameN.svh` files accordingly.
+2. To test on VGA Playground, paste the goose.hex after the frame_lut module
 
 ## External hardware
 
