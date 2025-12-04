@@ -1,6 +1,6 @@
 // palette[index][subpixel] = 6-bit  {r,g,b}
 // 16 palette entries, each with 4 subpixels
-reg [5:0] palette [0:7][0:3];
+reg [5:0] palette [0:2][0:3];
 
 initial begin
     // Example palette — same values you had

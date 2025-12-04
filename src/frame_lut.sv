@@ -1,6 +1,6 @@
 
 //------------------------------------------------------------
-// 32×32 FRAME — bitmap stored in frame0[y][x]
+// 25x25 FRAME — bitmap stored in frame0[y][x]
 //     frame0[][] contains a 3-bit palette index
 //------------------------------------------------------------
 module frame_lut(
