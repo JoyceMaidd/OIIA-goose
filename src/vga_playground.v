@@ -29,8 +29,8 @@ module tt_um_vga_example(
     // 01 - slow
     // 10 - fast
     // 11 - default
-    wire [1:0] speed_mode;
-    assign speed_mode = ui_in[3:2];
+    wire [1:0] spin_mode;
+    assign spin_mode = ui_in[3:2];
 
     //------------------------------------------------------------
     // VGA timing generator
@@ -47,20 +47,19 @@ module tt_um_vga_example(
     );
 
     //------------------------------------------------------------
-    // FRAMEBUFFER LOOKUP (frame0)
-    //
-    // You can store 2-bit or 4-bit indices per pixel.
-    // Here: 6-bit address, 4-bit output = 16-color palette
+    // FRAMEBUFFER to hold the current pixel colour for the sprite
     //------------------------------------------------------------
     wire [2:0] pixel_index0;
     wire [2:0] pixel_index1;
     wire [2:0] pixel_index2;
     wire [2:0] pixel_index3;
 
+    // Ensure that the goose sprite is drawn only once on the screen
     wire in_shape = pix_x[8] && !pix_x[9] && !pix_y[8];
 
     reg [2:0] pixel_index;
 
+    // Select the pixel from the current frame based on the frame number
     always @* begin
         case (frame_num)
             2'b00: pixel_index = pixel_index0;
@@ -71,6 +70,7 @@ module tt_um_vga_example(
         endcase
     end
 
+    // Shift the goose down by 50 pixels
     wire [9:0] vert_pos = pix_y - 50;
 
     frame_lut frame (
@@ -131,6 +131,7 @@ module tt_um_vga_example(
         .b(bg_b_uw)
     );
 
+  // Select the background based on inputs
   always @(*) begin
       case (ui_in[1:0])
           2'b00: begin
@@ -156,6 +157,7 @@ module tt_um_vga_example(
       endcase
   end
 
+  // Sound module
   sound_module sound_inst(
     .clk(clk),
     .rst_n(rst_n),
@@ -184,8 +186,8 @@ module tt_um_vga_example(
         if (pix_x == 0 && pix_y == 0) begin
           frame_counter <= frame_counter + 1;
           
-          if (speed_mode[0]) begin
-            if (!speed_mode[1]) begin
+          if (spin_mode[0]) begin
+            if (!spin_mode[1]) begin
               // slow
               if (frame_counter[1] & frame_counter[0]) begin
                 frame_num <= frame_num + 1;
@@ -199,7 +201,7 @@ module tt_um_vga_example(
             end
           end
           else begin
-            if (speed_mode[1]) begin
+            if (spin_mode[1]) begin
               // fast
               if (frame_counter[0]) begin
                 frame_num <= frame_num + 1;
@@ -749,7 +751,7 @@ module uw_bouncing(
   
 endmodule
 //------------------------------------------------------------
-// 32×32 FRAME — bitmap stored in frame0[y][x]
+// 25x25 FRAME — bitmap stored in frame0[y][x]
 //     frame0[][] contains a 4-bit palette index
 //------------------------------------------------------------
 module frame_lut(
@@ -891,21 +893,20 @@ module grass_bg(
   input wire frame
 );
 
-  // Local coordinates for each "grass cell"
+  // Draw the grass when the y-coordinate of the current pixel is in the grass region
   wire in_grass_blade_vert_region = pix_y[5] && pix_y[6] && pix_y[7];
 
-  // Define curved grass shape (using quadratic approximation)
+  // Define grass blade location based on x-coordinate (and the frame so that the grass appears to be moving)
   wire inside_grass_shape_1 = ((!frame & pix_x[1]) || (frame & pix_x[2])) && in_grass_blade_vert_region && 
                               ((pix_x[4] && !pix_x[3]) || (pix_x[3] && !pix_x[4] && !pix_x[5]) || (pix_x[5] && pix_x[6]));
 
-  // Draw the base layer of grass (flat bottom)
+  // Define the area for the grass base
   wire in_grass_base = (pix_y[5] && pix_y[6] && pix_y[7] && pix_y[4]) || pix_y[8];
 
   // Combine all grass regions
-  // wire in_all_grass = (inside_grass_shape_5) || in_grass_base;
   wire in_all_grass = inside_grass_shape_1 || in_grass_base;
 
-  // Output colors
+  // Output colors as blue or green based on whether the current pixel is the grass region
   assign r = in_all_grass ? 2'b00 : 2'b00;
   assign g = in_all_grass ? 2'b11 : 2'b10;
   assign b = in_all_grass ? 2'b00 : 2'b11;
@@ -925,7 +926,8 @@ module sound_module(
   
   reg part1;
 
-  wire [4:0] envelopeB = 5'd31 - timer[1:0] << 3;// exp(t*-20) decays to 0 approximately in 16 frames  [255 181 129  92  65  46  33  23  16  12   8   6   4   3]
+  // exponential decays in 4 frames
+  wire [4:0] envelopeB = 5'd31 - ({3'b000, timer[1:0]} << 3);
 
   // lead wave counter
   reg [4:0] note_freq;
@@ -935,10 +937,12 @@ module sound_module(
   wire [1:0] note_freq_sel;
 
   // lead notes
-  wire [3:0] note_in = timer[5:2];           // 16 notes, 4 frames per note each. 64 frames total, ~2 seconds
-    assign note_freq_sel[0] = !(note_in[0] ^ note_in[1]) && note_in[2];
-    assign note_freq_sel[1] = (!note_in[0] & note_in[1]) || (!note_in[2] & note_in[3]) || (!note_in[0] & !note_in[1]) || (note_in[1] & !note_in[2] & !note_in[3]);
-  
+  // 16 notes, 4 frames per note each. 64 frames total, ~2 seconds (if around 30 FPS)
+  // Select the current note selected
+  wire [3:0] note_in = timer[5:2];           
+  assign note_freq_sel[0] = !(note_in[0] ^ note_in[1]) && note_in[2];
+  assign note_freq_sel[1] = (!note_in[0] & note_in[1]) || (!note_in[2] & note_in[3]) || (!note_in[0] & !note_in[1]) || (note_in[1] & !note_in[2] & !note_in[3]);
+
   always @(*) begin
     case (note_freq_sel)
       2'd0: note_freq = 5'd0;
@@ -961,9 +965,9 @@ module sound_module(
     end else begin
       part1 <= timer[6];
 
-      // square wave
+      // Update the note counter and play the note by toggling the note on/off at the specified frequency
       if (x == 0) begin
-        if (note_counter > note_freq && note_freq != 0) begin
+        if (note_counter > {3'b000, note_freq} && note_freq != 0) begin
           note_counter <= 0;
           note <= ~note;
         end else begin
@@ -987,7 +991,7 @@ module palette_lut(
 );
 
 // palette[index][subpixel] = 6-bit  {r,g,b}
-// 16 palette entries, each with 4 subpixels
+// 6 palette entries, each with 4 subpixels
 reg [5:0] palette [0:7][0:3];
 
 initial begin
