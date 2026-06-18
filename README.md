@@ -6,9 +6,10 @@ OIIA Goose is A VGA demo inspired by the well-known "OIIA Cat" meme. It renders 
 
 ## Demo
 
+**3D viewer**: https://gds-viewer.tinytapeout.com/?model=https://joycemaidd.github.io/OIIA-goose/tinytapeout.oas&pdk=sky130A
+
 https://github.com/user-attachments/assets/04561e0d-b1d1-407a-a500-8e53dc14e199
 
-**3D viewer**: https://gds-viewer.tinytapeout.com/?model=https://joycemaidd.github.io/OIIA-goose/tinytapeout.oas&pdk=sky130A
 ## Features
 
 - **Spinning goose** with four sprite orientations (forward, backward, left, right)
